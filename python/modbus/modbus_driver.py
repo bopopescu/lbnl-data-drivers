@@ -108,6 +108,8 @@ class Modbus_Driver(object):
 
 
         self.register_dict = modbusConfig['modbus']['registers']
+        for key in self.register_dict:
+            self.register_dict[key][0] -= self.OFFSET_REGISTERS
 
 
     def initialize_modbus(self):
@@ -217,7 +219,6 @@ class Modbus_Driver(object):
         output = {}
 
         for key in self.register_dict:
-            self.register_dict[key][0] -= self.OFFSET_REGISTERS
             #print(self.register_dict[key][0])
             output[key] = self.decode_register(self.register_dict[key][0],self.register_dict[key][1])
 
