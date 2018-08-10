@@ -1,14 +1,15 @@
 from modbus_driver import Modbus_Driver
 import time
+from pymodbus.constants import Endian
+from pymodbus.payload import BinaryPayloadDecoder
 
-obj = Modbus_Driver("config.ini")
+obj = Modbus_Driver("config.yaml")
+
+
 obj.initialize_modbus()
-result= obj.read_single_register(0x0552)
-result2 = obj.read_single_register(0x060A)
-print("result = ", result.registers[0]/10.0)
-print("result2 = ", result2.registers[0])
-result2 = obj.read_single_register(0x060A)
-obj.write_data(0x060A,1)
-result2 = obj.read_single_register(0x060A)
-print("result2 = ", result2.registers[0])
+signal_strength = obj.decode_register(199,'32int')
+print(signal_strength)
+output = obj.get_data()
+print(output)
+
 obj.kill_modbus()

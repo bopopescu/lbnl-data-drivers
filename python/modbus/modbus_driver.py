@@ -22,6 +22,25 @@ the guard construct that is available in python 2.5 and up::
 
 
 ***Created 2018-07-22 by Chris Weyandt
+        ('string', decoder.decode_string(8)),
+        ('bits', decoder.decode_bits()),
+        ('8int', decoder.decode_8bit_int()),
+        ('8uint', decoder.decode_8bit_uint()),
+        ('16int', decoder.decode_16bit_int()),
+        ('16uint', decoder.decode_16bit_uint()),
+        ('32int', decoder.decode_32bit_int()),
+        ('32uint', decoder.decode_32bit_uint()),
+        ('32float', decoder.decode_32bit_float()),
+        ('32float2', decoder.decode_32bit_float()),
+        ('64int', decoder.decode_64bit_int()),
+        ('64uint', decoder.decode_64bit_uint()),
+        ('ignore', decoder.skip_bytes(8)),
+        ('64float', decoder.decode_64bit_float()),
+        ('64float2', decoder.decode_64bit_float())
+
+
+
+
 '''
 
 #---------------------------------------------------------------------------#
@@ -35,54 +54,61 @@ from pymodbus.client.sync import ModbusSerialClient
 from pymodbus.constants import Endian
 from pymodbus.payload import BinaryPayloadDecoder
 import configparser
-
+import yaml
 #---------------------------------------------------------------------------#
 # configure the client logging
 #---------------------------------------------------------------------------#
-# import logging
-# logging.basicConfig()
-# log = logging.getLogger()
-# log.setLevel(logging.INFO)
-
+import logging
+'''
+logging.basicConfig()
+log = logging.getLogger()
+log.setLevel(logging.DEBUG)
+'''
 
 class Modbus_Driver(object):
     def __init__(self, config_file, config_section=None):
-        Config = configparser.ConfigParser()
-        Config.read(config_file)
-        self.client = None
+        with open(config_file) as f:
+            # use safe_load instead load
+            modbusConfig = yaml.safe_load(f)
 
-        try:
-            if config_section != None:
-                modbus_config = Config[config_section]
-            else:
-                modbus_config = Config["modbus"]
+        self.MODBUS_TYPE = modbusConfig['modbus']['modbus_type']
+        if self.MODBUS_TYPE == 'serial':
+            print('serial')
+            self.METHOD = modbusConfig['modbus']['method']
+            self.SERIAL_PORT = modbusConfig['modbus']['port']
+            self.STOPBITS = modbusConfig['modbus']['stopbits']
+            self.BYTESIZE = modbusConfig['modbus']['bytesize']
+            self.PARITY = modbusConfig['modbus']['parity']
+            self.BAUDRATE = modbusConfig['modbus']['baudrate']
+        elif self.MODBUS_TYPE == 'tcp':
+            self.IP_ADDRESS = modbusConfig['modbus']['ip']
+        else:
+            print("Invalid modbus type")
+            exit()
 
-            self.MODBUS_TYPE = modbus_config.get("modbus_type")
-            if self.MODBUS_TYPE == 'serial':
-                self.METHOD = modbus_config.get("method")
-                self.SERIAL_PORT = modbus_config.get("port")
-                self.STOPBITS = modbus_config.getint("stopbits")
-                self.BYTESIZE = modbus_config.getint("bytesize")
-                self.PARITY = modbus_config.get("parity")
-                self.BAUDRATE = modbus_config.getint("baudrate")
-            elif self.MODBUS_TYPE == 'ip':
-                self.IP_ADDRESS = modbus_config.get("ip")
-            else:
-                print("Invalid modbus type")
-                exit()
-            self.START_REGISTER = modbus_config.getint("BASE_ADDRESS")
-            self.NUM_REGISTERS = modbus_config.getint("NUM_REGISTERS")
-            self.UNIT_ID = modbus_config.get("UNIT_ID")
-            self.UNIT_ID = int(self.UNIT_ID, 16)
-            self.names = modbus_config.get("names").split(',')
-            self.start_offsets = modbus_config.get("start_offsets").split(',')
-            self.lengths = modbus_config.get("lengths").split(',')
+        self.UNIT_ID = modbusConfig['modbus']['UNIT_ID']
+        self.OFFSET_REGISTERS = modbusConfig['modbus']['OFFSET_REGISTERS']
+
+        if modbusConfig['modbus']['byte_order'] == 'big':
+            self.BYTE_ORDER = Endian.Big
+        elif modbusConfig['modbus']['byte_order'] == 'little':
+            self.BYTE_ORDER = Endian.Little
+        else:
+            print("invalid byte order") # change to except later
+            exit()
+        if modbusConfig['modbus']['word_order'] == 'big':
+            print("big")
+            self.WORD_ORDER = Endian.Big
+        elif modbusConfig['modbus']['word_order'] == 'little':
+            self.WORD_ORDER = Endian.Little
+        else:
+            print("invalid byte order") # change to except later
+            exit()
 
 
-                    # if
-        except Exception as e:
-            #self.logger.error("unexpected error while setting configuration from config_file=%s, error=%s"%(self.config_file, str(e)))
-            raise e
+
+        self.register_dict = modbusConfig['modbus']['registers']
+
 
     def initialize_modbus(self):
         if self.MODBUS_TYPE == 'serial':
@@ -92,28 +118,110 @@ class Modbus_Driver(object):
         if self.MODBUS_TYPE == 'tcp':
             self.client = ModbusTcpClient(self.IP_ADDRESS)
 
-    def get_data(self):
-        output = {}
-        for i in range(len(self.names)):
-            rr = self.client.read_holding_registers(
-                    self.START_REGISTER+int(self.start_offsets[i])-1,
-                    int(self.lengths[i]),
-                    unit=self.UNIT_ID)
-            dec = BinaryPayloadDecoder.fromRegisters(
-                    rr.registers,
-                    byteorder=Endian.Big,
-                    wordorder=Endian.Little)
-            output[self.names[i]] = dec.decode_32bit_float()
-            # print(output)
-        return output
+
 
     def write_data(self,register,value):
         response = self.client.write_register(register,value,unit= self.UNIT_ID)
         return response
 
-    def read_single_register(self,register):
-        response = self.client.read_holding_registers(register,1,unit= self.UNIT_ID)
+    def read_register_raw(self,register,length):
+        response = self.client.read_holding_registers(register,length,unit= self.UNIT_ID)
         return response
+
+    def decode_register(self,register,type):
+        #omitting string for now since it requires a specified length
+
+        if type == '8int':
+            rr = self.read_register_raw(register,1)
+            decoder = BinaryPayloadDecoder.fromRegisters(
+                    rr.registers,
+                    byteorder=self.BYTE_ORDER,
+                    wordorder=self.WORD_ORDER)
+            output = decoder.decode_8bit_int()
+
+        elif type == '8uint':
+            rr = self.read_register_raw(register,1)
+            decoder = BinaryPayloadDecoder.fromRegisters(
+                    rr.registers,
+                    byteorder=self.BYTE_ORDER,
+                    wordorder=self.WORD_ORDER)
+            output = decoder.decode_8bit_uint()
+        elif type == '16int':
+            rr = self.read_register_raw(register,1)
+            decoder = BinaryPayloadDecoder.fromRegisters(
+                    rr.registers,
+                    byteorder=self.BYTE_ORDER,
+                    wordorder=self.WORD_ORDER)
+            output = decoder.decode_16bit_int()
+        elif type == '16uint':
+            rr = self.read_register_raw(register,1)
+            decoder = BinaryPayloadDecoder.fromRegisters(
+                    rr.registers,
+                    byteorder=self.BYTE_ORDER,
+                    wordorder=self.WORD_ORDER)
+            output = decoder.decode_16bit_uint()
+        elif type == '32int':
+            rr = self.read_register_raw(register,2)
+            decoder = BinaryPayloadDecoder.fromRegisters(
+                    rr.registers,
+                    byteorder=self.BYTE_ORDER,
+                    wordorder=self.WORD_ORDER)
+            output = decoder.decode_32bit_int()
+        elif type == '32uint':
+            rr = self.read_register_raw(register,2)
+            decoder = BinaryPayloadDecoder.fromRegisters(
+                    rr.registers,
+                    byteorder=self.BYTE_ORDER,
+                    wordorder=self.WORD_ORDER)
+            output = decoder.decode_32bit_uint()
+        elif type == '32float':
+            rr = self.read_register_raw(register,2)
+            decoder = BinaryPayloadDecoder.fromRegisters(
+                    rr.registers,
+                    byteorder=self.BYTE_ORDER,
+                    wordorder=self.WORD_ORDER)
+            output = decoder.decode_32bit_float()
+        elif type == '64int':
+            rr = self.read_register_raw(register,4)
+            decoder = BinaryPayloadDecoder.fromRegisters(
+                    rr.registers,
+                    byteorder=self.BYTE_ORDER,
+                    wordorder=self.WORD_ORDER)
+            output = decoder.decode_64bit_int()
+        elif type == '64uint':
+            rr = self.read_register_raw(register,4)
+            decoder = BinaryPayloadDecoder.fromRegisters(
+                    rr.registers,
+                    byteorder=self.BYTE_ORDER,
+                    wordorder=self.WORD_ORDER)
+            output = decoder.decode_64bit_uint()
+        elif type == 'ignore':
+            rr = self.read_register_raw(register,1)
+            decoder = BinaryPayloadDecoder.fromRegisters(
+                    rr.registers,
+                    byteorder=self.BYTE_ORDER,
+                    wordorder=self.WORD_ORDER)
+            output = decoder.skip_bytes(8)
+        elif type == '64float':
+            rr = self.read_register_raw(register,4)
+            decoder = BinaryPayloadDecoder.fromRegisters(
+                    rr.registers,
+                    byteorder=self.BYTE_ORDER,
+                    wordorder=self.WORD_ORDER)
+            output = decoder.decode_64bit_float()
+
+        return output
+
+    def get_data(self):
+
+        output = {}
+
+        for key in self.register_dict:
+            self.register_dict[key][0] -= self.OFFSET_REGISTERS
+            #print(self.register_dict[key][0])
+            output[key] = self.decode_register(self.register_dict[key][0],self.register_dict[key][1])
+
+        return output
 
     def kill_modbus(self):
         self.client.close()
