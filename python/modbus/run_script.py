@@ -12,16 +12,21 @@ obj = Modbus_Driver("config.yaml")
 
 
 obj.initialize_modbus()
-signal_strength = obj.decode_register(0,'32float')
-print(signal_strength)
-print(type(signal_strength))
-
 '''
-signal_strength = obj.decode_register(2,'32int')
+signal_strength = obj.decode_register(200,'32int')
 print(signal_strength)
 print(type(signal_strength))
 '''
-output = obj.get_data()
-print(output)
+'''
+'''
+#obj.write_coil(0,False)
+count = 0
+while (count < 80):
+    #print(count)
+    print(str(count) + " is " + str(obj.read_coil(count)))
+    print(str(count) + " is " + str(obj.read_discrete(count)))
+    count = count + 1
+#output = obj.get_data()
+#print(output)
 
 obj.kill_modbus()

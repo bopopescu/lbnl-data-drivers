@@ -58,12 +58,13 @@ import yaml
 #---------------------------------------------------------------------------#
 # configure the client logging
 #---------------------------------------------------------------------------#
+''''
 import logging
 
 logging.basicConfig()
 log = logging.getLogger()
 log.setLevel(logging.DEBUG)
-
+'''
 
 class Modbus_Driver(object):
     def __init__(self, config_file, config_section=None):
@@ -128,6 +129,18 @@ class Modbus_Driver(object):
     def write_data(self,register,value):
         response = self.client.write_register(register,value,unit= self.UNIT_ID)
         return response
+
+    def write_coil(self,register,value):
+        response = self.client.write_coil(register,value,unit= self.UNIT_ID)
+        return response
+
+    def read_coil(self,register):
+        rr = self.client.read_coils(register, 1, unit=1)
+        return rr.bits[0]
+
+    def read_discrete(self,register):
+        rr = self.client.read_discrete_inputs(register, count=1,unit= self.UNIT_ID)
+        return rr.bits[0]
 
     def read_register_raw(self,register,length):
         print(register)
