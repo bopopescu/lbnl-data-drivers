@@ -143,9 +143,15 @@ class Modbus_Driver(object):
         return rr.bits[0]
 
     def read_register_raw(self,register,length):
-        print(register)
-        print(length)
+        #print(register)
+        #print(length)
         response = self.client.read_holding_registers(register,length,unit= self.UNIT_ID)
+        return response
+
+    def read_input_raw(self,register,length):
+        #print(register)
+        #print(length)
+        response = self.client.read_input_registers(register,length,unit= self.UNIT_ID)
         return response
 
     def decode_register(self,register,type):
@@ -234,6 +240,94 @@ class Modbus_Driver(object):
             exit()
 
         return output
+
+    def decode_input_register(self,register,type):
+        #omitting string for now since it requires a specified length
+
+        if type == '8int':
+            rr = self.read_input_raw(register,1)
+            decoder = BinaryPayloadDecoder.fromRegisters(
+                    rr.registers,
+                    byteorder=self.BYTE_ORDER,
+                    wordorder=self.WORD_ORDER)
+            output = decoder.decode_8bit_int()
+
+        elif type == '8uint':
+            rr = self.read_input_raw(register,1)
+            decoder = BinaryPayloadDecoder.fromRegisters(
+                    rr.registers,
+                    byteorder=self.BYTE_ORDER,
+                    wordorder=self.WORD_ORDER)
+            output = decoder.decode_8bit_uint()
+        elif type == '16int':
+            rr = self.read_input_raw(register,1)
+            decoder = BinaryPayloadDecoder.fromRegisters(
+                    rr.registers,
+                    byteorder=self.BYTE_ORDER,
+                    wordorder=self.WORD_ORDER)
+            output = decoder.decode_16bit_int()
+        elif type == '16uint':
+            rr = self.read_input_raw(register,1)
+            decoder = BinaryPayloadDecoder.fromRegisters(
+                    rr.registers,
+                    byteorder=self.BYTE_ORDER,
+                    wordorder=self.WORD_ORDER)
+            output = decoder.decode_16bit_uint()
+        elif type == '32int':
+            rr = self.read_input_raw(register,2)
+            decoder = BinaryPayloadDecoder.fromRegisters(
+                    rr.registers,
+                    byteorder=self.BYTE_ORDER,
+                    wordorder=self.WORD_ORDER)
+            output = decoder.decode_32bit_int()
+        elif type == '32uint':
+            rr = self.read_input_raw(register,2)
+            decoder = BinaryPayloadDecoder.fromRegisters(
+                    rr.registers,
+                    byteorder=self.BYTE_ORDER,
+                    wordorder=self.WORD_ORDER)
+            output = decoder.decode_32bit_uint()
+        elif type == '32float':
+            rr = self.read_input_raw(register,2)
+            decoder = BinaryPayloadDecoder.fromRegisters(
+                    rr.registers,
+                    byteorder=self.BYTE_ORDER,
+                    wordorder=self.WORD_ORDER)
+            output = decoder.decode_32bit_float()
+        elif type == '64int':
+            rr = self.read_input_raw(register,4)
+            decoder = BinaryPayloadDecoder.fromRegisters(
+                    rr.registers,
+                    byteorder=self.BYTE_ORDER,
+                    wordorder=self.WORD_ORDER)
+            output = decoder.decode_64bit_int()
+        elif type == '64uint':
+            rr = self.read_input_raw(register,4)
+            decoder = BinaryPayloadDecoder.fromRegisters(
+                    rr.registers,
+                    byteorder=self.BYTE_ORDER,
+                    wordorder=self.WORD_ORDER)
+            output = decoder.decode_64bit_uint()
+        elif type == 'ignore':
+            rr = self.read_input_raw(register,1)
+            decoder = BinaryPayloadDecoder.fromRegisters(
+                    rr.registers,
+                    byteorder=self.BYTE_ORDER,
+                    wordorder=self.WORD_ORDER)
+            output = decoder.skip_bytes(8)
+        elif type == '64float':
+            rr = self.read_input_raw(register,4)
+            decoder = BinaryPayloadDecoder.fromRegisters(
+                    rr.registers,
+                    byteorder=self.BYTE_ORDER,
+                    wordorder=self.WORD_ORDER)
+            output = decoder.decode_64bit_float()
+        else:
+            print("Wrong type specified")
+            exit()
+
+        return output
+
 
     def get_data(self):
 
