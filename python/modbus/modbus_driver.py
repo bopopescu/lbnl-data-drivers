@@ -109,11 +109,13 @@ class Modbus_Driver(object):
             print("invalid byte order") # change to except later
             exit()
 
+        self.coil_register_dict = modbusConfig[modbus_section]['coil_registers']
+        self.discrete_register_dict = modbusConfig[modbus_section]['discrete_registers']
+        self.holding_register_dict = modbusConfig[modbus_section]['holding_registers']
+        self.input_register_dict = modbusConfig[modbus_section]['input_registers']
 
-
-        self.register_dict = modbusConfig[modbus_section]['registers']
-        for key in self.register_dict:
-            self.register_dict[key][0] -= self.OFFSET_REGISTERS
+        for key in self.holding_register_dict:
+            self.holding_register_dict[key][0] -= self.OFFSET_REGISTERS
 
 
     def initialize_modbus(self):
@@ -124,6 +126,12 @@ class Modbus_Driver(object):
         if self.MODBUS_TYPE == 'tcp':
             self.client = ModbusTcpClient(self.IP_ADDRESS,port=self.PORT)
 
+        '''
+        print(self.coil_register_dict)
+        print(self.discrete_register_dict)
+        print(self.holding_register_dict)
+        print(self.input_register_dict)
+        '''
 
 
     def write_data(self,register,value):
@@ -332,10 +340,21 @@ class Modbus_Driver(object):
     def get_data(self):
 
         output = {}
-
-        for key in self.register_dict:
+        for key in self.coil_register_dict:
             #print(self.register_dict[key][0])
-            output[key] = self.decode_register(self.register_dict[key][0],self.register_dict[key][1])
+            output[key] = self.read_coil(self.coil_register_dict[key][0])
+
+        for key in self.discrete_register_dict:
+            #print(self.register_dict[key][0])
+            output[key] = self.read_discrete(self.discrete_register_dict[key][0])
+
+        for key in self.holding_register_dict:
+            #print(self.register_dict[key][0])
+            output[key] = self.decode_register(self.holding_register_dict[key][0],self.holding_register_dict[key][1])
+
+        for key in self.input_register_dict:
+            #print(self.register_dict[key][0])
+            output[key] = self.decode_input_register(self.input_register_dict[key][0],self.input_register_dict[key][1])
 
         return output
 

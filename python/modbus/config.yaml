@@ -1,16 +1,33 @@
 modbus:
+    UNIT_ID: 0x1
+    byte_order: big
+    word_order: little
+    #                          ### Modbus typ ###
+    # This can be set to 'tcp' or 'serial' and determines the modbus method that
+    # the driver will use.  The appropriate settings will be used below and the
+    # irrelevant ones will be ignored
     modbus_type: tcp
+    #modbus_type: serial
+
+    #                          ### Serial Settings ###
     method: rtu
-    port: 5020
     stopbits: 1
     bytesize: 8
     parity: E
     baudrate: 19200
+    #                          ### Modbus TCP Settings ###
     ip: 127.0.0.1
+    port: 5020
+    #                          ### OFFSET Regitsers
+    # This controls how much will be subtracted from all of the register addresses
+    # Some device specs will list the register address as 1, but when being accessed
+    # It will actually need to be sent addressed as 0.
     OFFSET_REGISTERS: 0
-    UNIT_ID: 0x1
-    byte_order: big
-    word_order: little
-    #registers: {signal_strength:[0,32int]}
-    registers: {signal_strength:[100,32float],temperature:[102,32float],test_count:[102,32int]}
-    #registers: {signal_strength:[0,32float],flow_rate:[2,32float],net_total:[4,32float],positive_totalizer:[6,32float],negative_totalizer:[8,32float],temp1:[10,32float]}
+    #                          ### Target registers ###
+    # These registers will be accessed when the get_data() function is called
+    # the function will return a dictionary with the data for each register
+    # Register names must be unique or data will be overwritten
+    coil_registers: {status: [0],other_status: [47]}
+    discrete_registers: {status_discrete: [0],other_status_discrete: [47]}
+    holding_registers: {signal_strength: [100,32float],temperature: [102,32float],test_count: [104,32int], count: [104,16int]}
+    input_registers: {signal_strength_input: [100,32float],temperature_input: [102,32float],test_count_input: [104,32int], count_input: [104,16int]}
