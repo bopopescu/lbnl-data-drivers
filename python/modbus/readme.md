@@ -55,7 +55,7 @@ as the type specified and does not need to be decoded. The types that can be
 specified is listed below.
 
 
-| Tables        | Length (registers) |
+|   Type          | Length (registers) |
 | ------------- |:------------------:|
 |        ignore |                  1 |
 |          8int |                  1 |
