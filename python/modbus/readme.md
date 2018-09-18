@@ -80,4 +80,4 @@ specified is listed below.
 
 Reads all the registers specified in the config file and returns them as a
 dictionary. All register names in the config file must be unique. There is an
-example of how the registers can be specified can be seen [here](https://github.com/cweyandt/lbnl-data-drivers/blob/master/python/modbus/config.yaml)
+example of how the registers can be specified can be seen [here.](https://github.com/cweyandt/lbnl-data-drivers/blob/master/python/modbus/config.yaml)
