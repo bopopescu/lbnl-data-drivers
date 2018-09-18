@@ -7,20 +7,15 @@
 '''
 Pymodbus Synchrnonous Client Test with Dynasonic DXN Energy Meter
 --------------------------------------------------------------------------
-
 The following is an example of how to use the synchronous modbus client
 implementation from pymodbus. This has been adapted from a sample script
 at https://pythonhosted.org/pymodbus/examples/synchronous-client.html
-
 _Additional Note from sample script:
 It should be noted that the client can also be used with
 the guard construct that is available in python 2.5 and up::
-
     with ModbusClient('127.0.0.1') as client:
         result = client.read_coils(1,10)
         print result
-
-
 ***Created 2018-07-22 by Chris Weyandt
         ('string', decoder.decode_string(8)),
         ('bits', decoder.decode_bits()),
@@ -37,10 +32,6 @@ the guard construct that is available in python 2.5 and up::
         ('ignore', decoder.skip_bytes(8)),
         ('64float', decoder.decode_64bit_float()),
         ('64float2', decoder.decode_64bit_float())
-
-
-
-
 '''
 
 #---------------------------------------------------------------------------#
@@ -60,7 +51,6 @@ import yaml
 #---------------------------------------------------------------------------#
 ''''
 import logging
-
 logging.basicConfig()
 log = logging.getLogger()
 log.setLevel(logging.DEBUG)
