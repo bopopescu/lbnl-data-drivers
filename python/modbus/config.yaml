@@ -1,8 +1,9 @@
 modbus:
+    ########################### Modbus Settings ####################################
     UNIT_ID: 0x1
     byte_order: big
     word_order: little
-    #                          ### Modbus typ ###
+    #                          ### Modbus type ###
     # This can be set to 'tcp' or 'serial' and determines the modbus method that
     # the driver will use.  The appropriate settings will be used below and the
     # irrelevant ones will be ignored
@@ -18,6 +19,7 @@ modbus:
     #                          ### Modbus TCP Settings ###
     ip: 127.0.0.1
     port: 5020
+    ########################## Regitser Settings ###################################
     #                          ### OFFSET Regitsers
     # This controls how much will be subtracted from all of the register addresses
     # Some device specs will list the register address as 1, but when being accessed
