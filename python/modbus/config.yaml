@@ -27,7 +27,31 @@ modbus:
     # These registers will be accessed when the get_data() function is called
     # the function will return a dictionary with the data for each register
     # Register names must be unique or data will be overwritten
+    
+    #                          ### Coil/Discrete registers ###
+    # These registers only need a name and the first value is the
+    # register address.
     coil_registers: {status: [0],other_status: [47]}
     discrete_registers: {status_discrete: [0],other_status_discrete: [47]}
+    #                          ### Input/Holding registers ###
+    # These registers need a unique name (key of dictionary) that is not 
+    # used in any other type of register. The value of the dictionary is 
+    # a list. The first value of the list is the register address and the
+    # second value is the type. The types that can be specified are listed 
+    # below.
+    # |   Type          | Length (registers) |
+    # | ------------- |:------------------:|
+    # |        ignore |                  1 |
+    # |          8int |                  1 |
+    # |         8uint |                  1 |
+    # |         16int |                  1 |
+    # |        16uint |                  1 |
+    # |         32int |                  2 |
+    # |        32uint |                  2 |
+    # |       32float |                  2 |
+    # |         64int |                  4 |
+    # |        64uint |                  4 |
+    # |       64float |                  4 |
+    
     holding_registers: {signal_strength: [100,32float],temperature: [102,32float],test_count: [104,32int], count: [104,16int]}
     input_registers: {signal_strength_input: [100,32float],temperature_input: [102,32float],test_count_input: [104,32int], count_input: [104,16int]}
