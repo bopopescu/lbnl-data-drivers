@@ -12,48 +12,23 @@ obj = Modbus_Driver("config.yaml")
 
 
 obj.initialize_modbus()
-'''
-signal_strength = obj.decode_register(200,'32int')
-print(signal_strength)
-print(type(signal_strength))
-'''
-'''
-'''
-#obj.write_coil(0,False)
-'''
-count = 0
-while (count < 80):
-    #print(count)
-    print(str(count) + " is " + str(obj.read_coil(count)))
-    print(str(count) + " is " + str(obj.read_discrete(count)))
-    count = count + 1
-'''
-'''
-count = 0
-while (count < 80):
-    #print(count)
-    print(str(count) + " is " + str(obj.read_coil(count)))
-    print(str(count) + " is " + str(obj.read_discrete(count)))
-    count = count + 1
-'''
-#output = obj.get_data()
-#print(output)
-#obj.read_input(5)
-'''
-f_value = obj.decode_register(100,'32float')
-test = obj.decode_register(104,'32int')
-signal_strength = obj.decode_register(106,'16int')
-print("HOLDING FLOAT")
-print(f_value)
-print("HOLDING INT32")
-print(test)
-print("HOLDING INT16")
-print(signal_strength)
-print("INPUT FLOAT")
-print(obj.decode_input_register(100,'32float'))
-print("INPUT INT16")
-print(obj.decode_input_register(106,'16int'))
-'''
+"""
+target_address = 0x601
+while (target_address < 1623):
+    previous_value = obj.decode_register(target_address,'16int')
+    print(previous_value)
+    add_value = 1
+    if (previous_value < 0):
+        obj.write_data(target_address,0)
+    else:
+        obj.write_data(target_address,(previous_value + add_value))
+    current_value = obj.decode_register(target_address,'16int')
+    print("The previous value at address " +str(target_address) + " was: " +str(previous_value))
+    print("The current value at address " +str(target_address) + " is: " +str(current_value))
+    target_address += 1
+"""
+obj.write_data(0x655,0)
+
 output = obj.get_data()
 print(output)
 
