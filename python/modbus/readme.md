@@ -55,7 +55,7 @@ as the type specified and does not need to be decoded. The types that can be
 specified is listed below.
 
 
-| Tables        | Length (registers) |
+|   Type          | Length (registers) |
 | ------------- |:------------------:|
 |        ignore |                  1 |
 |          8int |                  1 |
@@ -80,4 +80,4 @@ specified is listed below.
 
 Reads all the registers specified in the config file and returns them as a
 dictionary. All register names in the config file must be unique. There is an
-example of how the registers can be specified can be seen here.
+example of how the registers can be specified can be seen [here.](https://github.com/cweyandt/lbnl-data-drivers/blob/master/python/modbus/config.yaml)
