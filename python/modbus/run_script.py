@@ -27,7 +27,7 @@ while (target_address < 1623):
     print("The current value at address " +str(target_address) + " is: " +str(current_value))
     target_address += 1
 """
-obj.write_data(0x655,0)
+#obj.write_data(0x655,0)
 
 output = obj.get_data()
 print(output)

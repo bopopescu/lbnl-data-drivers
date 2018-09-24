@@ -3,6 +3,7 @@ modbus:
     UNIT_ID: 0x1
     byte_order: big
     word_order: little
+    enable_logging: False
     #                          ### Modbus type ###
     # This can be set to 'tcp' or 'serial' and determines the modbus method that
     # the driver will use.  The appropriate settings will be used below and the
@@ -15,10 +16,11 @@ modbus:
     stopbits: 1
     bytesize: 8
     parity: E
+    serial_port: /dev/ttyUSB0
     baudrate: 19200
     #                          ### Modbus TCP Settings ###
     ip: 127.0.0.1
-    port: 5020
+    tcp_port: 5020
     ########################## Regitser Settings ###################################
     #                          ### OFFSET Regitsers
     # This controls how much will be subtracted from all of the register addresses
