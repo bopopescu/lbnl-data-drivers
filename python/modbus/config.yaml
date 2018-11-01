@@ -1,6 +1,9 @@
 modbus:
     ########################### Modbus Settings ####################################
-    UNIT_ID: 0x1
+    # UNIT_ID can be defined as a list like below or as a single device id as in the
+    # commented out setting
+    UNIT_ID: [0x1,0x1,0x1]
+    #UNIT_ID: 0x1
     byte_order: big
     word_order: little
     enable_logging: False
