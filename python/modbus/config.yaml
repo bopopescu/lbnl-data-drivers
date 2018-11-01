@@ -57,5 +57,21 @@ modbus:
     # |        64uint |                  4 |
     # |       64float |                  4 |
 
-    holding_registers: {signal_strength: [100,32float],temperature: [102,32float],test_count: [104,32int], count: [106,16int]}
-    input_registers: {signal_strength_input: [100,32float],temperature_input: [102,32float],test_count_input: [104,32int], count_input: [104,16int]}
+    holding_registers: {
+                        signal_strength: [100,32float],
+                        temperature: [102,32float],
+                        test_count: [104,32int],
+                        count: [106,16int],
+                        more_counting: [108,32int],
+                        unsigned_test: [110,32uint],
+                        unsigned_test_count: [112,32uint],
+                        unsigned_short_count: [114,16uint],
+                        long_integer_test: [116,64int],
+                        long_integer_test2: [120,64int]
+    }
+    input_registers: {
+                        signal_strength_input: [100,32float],
+                        temperature_input: [102,32float],
+                        test_count_input: [104,32int],
+                        count_input: [106,16int]
+    }
