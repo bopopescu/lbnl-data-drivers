@@ -81,3 +81,10 @@ specified is listed below.
 Reads all the registers specified in the config file and returns them as a
 dictionary. All register names in the config file must be unique. There is an
 example of how the registers can be specified can be seen [here.](https://github.com/cweyandt/lbnl-data-drivers/blob/master/python/modbus/config.yaml)
+
+### get_data_all_devices(self):
+
+Reads all registers from all devices listed in the ```UNIT_ID``` list in ```config.yaml```. 
+If the ```UNIT_ID``` is not declared as a list in ```config.yaml``` this is 
+currently an error, but will be changed once the return format is in 
+dictionary format.
