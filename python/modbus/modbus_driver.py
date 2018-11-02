@@ -53,9 +53,13 @@ class Modbus_Driver(object):
             self.UNIT_ID_LIST = self.UNIT_ID
             #Set default UNIT_ID as first UNIT_ID in list
             self.UNIT_ID = self.UNIT_ID_LIST[0]
-            #print("Go BOOM")
-        #print(type(self.UNIT_ID))
-        #if self.UNIT_ID
+        else:
+            # Make a unit id list from the non-list definition for compatibility
+            # reasons of previous configs. This also eliminates the possibility
+            # of error in calling get_data_all_devices() on a config with a non
+            # list definition
+            self.UNIT_ID_LIST = []
+            self.UNIT_ID_LIST.append(self.UNIT_ID)
 
         # Start logging if enabled in config
         self.LOGGING_FLAG = modbusConfig[modbus_section]['enable_logging']
@@ -490,10 +494,15 @@ class Modbus_Driver(object):
 
         return output
     def get_data_all_devices(self):
-        reg_data_list = []
+        reg_data_dict = {}
+        cnt = 1
         for dev_id in self.UNIT_ID_LIST:
-            reg_data_list.append(self.get_data(self.UNIT_ID_LIST[dev_id]))
-        return reg_data_list
+            new_key = str(self.UNIT_ID_LIST[dev_id])
+            if str(self.UNIT_ID_LIST[dev_id]) in reg_data_dict:
+                new_key = new_key + '_' + str(cnt)
+                cnt += 1
+            reg_data_dict[new_key] = self.get_data(self.UNIT_ID_LIST[dev_id])
+        return reg_data_dict
     def kill_modbus(self):
         """
         Closes connection with Modbus Slave
