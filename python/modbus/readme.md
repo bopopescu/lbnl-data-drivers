@@ -76,7 +76,7 @@ registers may be read depending on the type specified.  The value is returned
 as the type specified and does not need to be decoded. The types that can be
 specified is listed below.
 
-### get_data(self):
+### get_data(self,UNIT_ID):
 
 Reads all the registers specified in the config file and returns them as a
 dictionary. All register names in the config file must be unique. There is an
@@ -85,6 +85,6 @@ example of how the registers can be specified can be seen [here.](https://github
 ### get_data_all_devices(self):
 
 Reads all registers from all devices listed in the ```UNIT_ID``` list in ```config.yaml```. 
-If the ```UNIT_ID``` is not declared as a list in ```config.yaml``` this is 
-currently an error, but will be changed once the return format is in 
-dictionary format.
+and calls get_data(UNIT_ID) on each member of the list and adds them to a dictionary
+where the key is the UNIT_ID from the list and the value is the dictionary returned
+by get_data().
