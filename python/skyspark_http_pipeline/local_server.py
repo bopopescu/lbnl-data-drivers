@@ -49,10 +49,9 @@ class MyServer(BaseHTTPRequestHandler):
 			items = unquoted_path.split('?') # Payload = 1	
 			data = items[1]
 			
-			# TODO: Get Authentication working again
 			ret = req.post(REMOTE_URI_NERSC, headers=REMOTE_HEADERS_NERSC,auth=(authentication_yaml['ElasticSearch']['username'],authentication_yaml['ElasticSearch']['password']),data=data)
 			
-			payload = ret.text
+			payload = json.dumps(ret.text)
 			self.send_response(200)
 			self.send_header("Content-type", "application/json")
 			self.end_headers()
