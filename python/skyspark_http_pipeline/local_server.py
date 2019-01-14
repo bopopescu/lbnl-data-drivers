@@ -50,7 +50,8 @@ class MyServer(BaseHTTPRequestHandler):
 			data = items[1]
 			
 			ret = req.post(REMOTE_URI_NERSC, headers=REMOTE_HEADERS_NERSC,auth=(authentication_yaml['ElasticSearch']['username'],authentication_yaml['ElasticSearch']['password']),data=data)
-			payload = ret.text
+			intermediate = json.loads(ret.text)
+			payload = json.dumps(intermediate)
 			self.send_response(200)
 			self.send_header("Content-type", "application/json")
 			self.end_headers()
