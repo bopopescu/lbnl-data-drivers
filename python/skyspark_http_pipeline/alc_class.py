@@ -127,7 +127,7 @@ class alc_client():
 		holdingDict = {}
 
 		for key, value in dictionary.items():
-			dictlist.append([str(datetime.strptime(key, '%d/%m/%Y %H:%M:%S %p').strftime('%Y-%m-%d %H:%M:%S')), value])
+			dictlist.append([str(datetime.strptime(key, '%m/%d/%Y %H:%M:%S %p').strftime('%Y-%m-%d %H:%M:%S')), value])
 
 		holdingDict["value"] = dictlist
 
