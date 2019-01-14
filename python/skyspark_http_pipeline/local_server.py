@@ -50,13 +50,13 @@ class MyServer(BaseHTTPRequestHandler):
 			
 			# TODO: Get Authentication working again
 			ret = req.post(REMOTE_URI_NERSC, headers=REMOTE_HEADERS_NERSC,auth=(authentication_yaml['ElasticSearch']['username'],authentication_yaml['ElasticSearch']['password']),data=data)
-			payload = json.dumps(ret)
+			
 			self.send_response(200)
 			self.send_header("Content-type", "application/json")
 			self.end_headers()
 		
 			# TODO: Confirm sent data is in format Skyspark likes
-			self.wfile.write(payload.encode('utf-8'))
+			self.wfile.write(ret.encode('utf-8'))
 
 		elif self.path.endswith("alc"):
 			unquoted_path = urllib.parse.unquote_plus(self.path)
