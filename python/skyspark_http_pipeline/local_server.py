@@ -45,6 +45,7 @@ class MyServer(BaseHTTPRequestHandler):
 
 		if self.path.endswith("elastic"):
 			unquoted_path = urllib.parse.unquote_plus(self.path)
+			print("This is the path: ",unquoted_path)
 			items = unquoted_path.split('?') # Payload = 1	
 			data = items[1]
 			
@@ -56,6 +57,7 @@ class MyServer(BaseHTTPRequestHandler):
 			self.end_headers()
 		
 			# TODO: Confirm sent data is in format Skyspark likes
+			print("This is the return: ",ret.text)
 			self.wfile.write(ret.encode('utf-8'))
 
 		elif self.path.endswith("alc"):
