@@ -5,6 +5,7 @@ import requests as req
 import urllib.parse
 import yaml# pip install pyyaml
 from alc_class import alc_client
+from elastic_class import elastic_client
 from datetime import datetime
 
 # Host name and port number that server will operate under for Skyspark to discover
@@ -21,9 +22,8 @@ with open('authentication.yaml', 'r') as file_auth:
 
 # Declare ALC client from alc_class.py with credentials from yaml file
 ALC_CLIENT = alc_client(username=authentication_yaml['ALC']['username'],password=authentication_yaml['ALC']['password'])
-
-# Fake Json for testing purposes. Remove when rolling out.
-FAKE_JSON = json.dumps({"metric": "data.meter:output power|data.host:pdu11-fpc|data.modbus_point:Real Power", "hits": 19531, "value": [["2018-10-01T03:37:48.000Z", 30.0], ["2018-10-04T03:38:18.000Z", 30.0]]})
+# Declare ELASTIC client from elastic_class.py with credentials from yaml file
+ELASTIC_CLIENT = elastic_client(uri=REMOTE_URI_NERSC,headers=REMOTE_HEADERS_NERSC,username=authentication_yaml['ElasticSearch']['username'],password=authentication_yaml['ElasticSearch']['password'])
 
 
 class MyServer(BaseHTTPRequestHandler):
@@ -45,19 +45,14 @@ class MyServer(BaseHTTPRequestHandler):
 
 		if self.path.endswith("elastic"):
 			unquoted_path = urllib.parse.unquote_plus(self.path)
-			print("This is the path: ",unquoted_path)
 			items = unquoted_path.split('?') # Payload = 1	
 			data = items[1]
 			
-			ret = req.post(REMOTE_URI_NERSC, headers=REMOTE_HEADERS_NERSC,auth=(authentication_yaml['ElasticSearch']['username'],authentication_yaml['ElasticSearch']['password']),data=data)
-			payload = ret.text
-			
+			ret = ELASTIC_CLIENT.get_timeseries(data=data)
+			payload = json.dumps(ret)
 			self.send_response(200)
 			self.send_header("Content-type", "application/json")
 			self.end_headers()
-		
-			# TODO: Confirm sent data is in format Skyspark likes
-			
 			self.wfile.write(payload.encode('utf-8'))
 
 		elif self.path.endswith("alc"):

@@ -114,7 +114,7 @@ class alc_client():
 
 			try:
 				r = client.service.getTrendData(log, start_time, final_time, limit_from_start, max_records)
-                # Parse and convert to pandas
+                # Parse and convert to dictionary
 				time = r[::2]
 				data = [float(x) for x in r[1::2]]
 
