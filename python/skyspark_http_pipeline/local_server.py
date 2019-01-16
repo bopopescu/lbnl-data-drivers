@@ -49,11 +49,22 @@ class MyServer(BaseHTTPRequestHandler):
 			data = items[1]
 			
 			ret = ELASTIC_CLIENT.get_timeseries(data=data)
-			payload = json.dumps(ret)
-			self.send_response(200)
-			self.send_header("Content-type", "application/json")
-			self.end_headers()
-			self.wfile.write(payload.encode('utf-8'))
+	
+			# Incorrect query returned no results
+			if ret == 404:
+				self.send_response(404)
+				self.end_headers()
+			# Unauthorized with given credentials
+			elif ret == 401:
+				self.send_response(401)
+				self.end_headers()
+			# Write back JSON data
+			else:
+				payload = json.dumps(ret)
+				self.send_response(200)
+				self.send_header("Content-type", "application/json")
+				self.end_headers()
+				self.wfile.write(payload.encode('utf-8'))
 
 		elif self.path.endswith("alc"):
 			unquoted_path = urllib.parse.unquote_plus(self.path)
@@ -64,11 +75,22 @@ class MyServer(BaseHTTPRequestHandler):
 			end_date = datetime.strptime(items[3], '%Y-%m-%d %H:%M:%S').strftime('%m/%d/%Y %I:%M:%S %p')
 
 			ret = ALC_CLIENT.collect_data(trend_log_paths=data, start_time=start_date, final_time=end_date)
-			payload = json.dumps(ret)
-			self.send_response(200)
-			self.send_header("Content-type", "application/json")
-			self.end_headers()
-			self.wfile.write(payload.encode('utf-8'))
+
+			# Incorrect query returned no results
+			if ret == 404:
+				self.send_response(404)
+				self.end_headers()
+			# Unauthorized with given credentials
+			elif ret == 401:
+				self.send_response(401)
+				self.end_headers()
+			# Write back JSON data
+			else:
+				payload = json.dumps(ret)
+				self.send_response(200)
+				self.send_header("Content-type", "application/json")
+				self.end_headers()
+				self.wfile.write(payload.encode('utf-8'))
 
 # Declare HTTP server request object with declared hostname and port number.
 myServer = HTTPServer((hostName, hostPort), MyServer)

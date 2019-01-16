@@ -23,6 +23,11 @@ class elastic_client():
 		-------
 		returned_dict : dictionary
 		Dictionary of parsed timesereis information with Tree structure of {value -> [[DateTime,Data]*]}
+
+		Raises
+		------
+		401: Unauthorized credentials 
+		404: Not Found/Query incorrect
 		
 		'''
 		
@@ -33,12 +38,16 @@ class elastic_client():
 			value_list = []
 			for item in var['value']:
 				value_list.append([item[0],item[1]])
-				#datum.append(item[1])
-				#timestamp.append(item[0])
+
 			returned_dict["value"] = value_list
 			
 		except Exception as e:
-			print("Error getting meter data: ",str(e))
+			print("\nError getting meter data: ",str(e),"\n")
+
+			if ret.status_code == 401: # Credentials incorrect
+				return 401
+			elif 'value' in str(e): # Query incorrect and no timeseries data returned
+				return 404
 
 		return returned_dict
 ##################################################################################################

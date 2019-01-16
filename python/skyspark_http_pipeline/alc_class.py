@@ -114,13 +114,19 @@ class alc_client():
 
 			try:
 				r = client.service.getTrendData(log, start_time, final_time, limit_from_start, max_records)
+
                 # Parse and convert to dictionary
 				time = r[::2]
 				data = [float(x) for x in r[1::2]]
 
 			except Exception as e:
-				time = []
-				data = []
+				print("\nError getting meter data: ",str(e),"\n")
+
+				if 'does not exist' in str(e): # Query incorrect
+					return 404
+
+				elif 'Unauthorized' in str(e): # Credentials incorrect
+					return 401
 
 		dictionary = dict(zip(time, data))
 		dictlist = []
