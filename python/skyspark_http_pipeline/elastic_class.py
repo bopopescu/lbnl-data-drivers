@@ -46,8 +46,10 @@ class elastic_client():
 
 			if ret.status_code == 401: # Credentials incorrect
 				return 401
-			elif 'value' in str(e): # Query incorrect and no timeseries data returned
+			elif ret.status_code == 404: # URL incorrect or not found
 				return 404
+			elif 'value' in str(e): # Query incorrect and no timeseries data returned
+				return 204
 
 		return returned_dict
 ##################################################################################################

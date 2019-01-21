@@ -50,9 +50,13 @@ class MyServer(BaseHTTPRequestHandler):
 			
 			ret = ELASTIC_CLIENT.get_timeseries(data=data)
 	
-			# Incorrect query returned no results
+			# URI path not found
 			if ret == 404:
 				self.send_response(404)
+				self.end_headers()
+			# Incorrect query returned no results
+			if ret == 204:
+				self.send_response(204)
 				self.end_headers()
 			# Unauthorized with given credentials
 			elif ret == 401:
@@ -77,8 +81,8 @@ class MyServer(BaseHTTPRequestHandler):
 			ret = ALC_CLIENT.collect_data(trend_log_paths=data, start_time=start_date, final_time=end_date)
 
 			# Incorrect query returned no results
-			if ret == 404:
-				self.send_response(404)
+			if ret == 204:
+				self.send_response(204)
 				self.end_headers()
 			# Unauthorized with given credentials
 			elif ret == 401:

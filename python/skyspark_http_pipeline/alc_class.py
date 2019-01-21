@@ -123,7 +123,7 @@ class alc_client():
 				print("\nError getting meter data: ",str(e),"\n")
 
 				if 'does not exist' in str(e): # Query incorrect
-					return 404
+					return 204
 
 				elif 'Unauthorized' in str(e): # Credentials incorrect
 					return 401
