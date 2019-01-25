@@ -1,3 +1,4 @@
 *.DS_Store
 *.yaml
 python/skyspark_http_pipeline/__pycache__/alc_class.cpython-37.pyc
+python/skyspark_http_pipeline/__pycache__/elastic_class.cpython-37.pyc
