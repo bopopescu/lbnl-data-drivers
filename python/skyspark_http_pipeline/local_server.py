@@ -88,6 +88,10 @@ class MyServer(BaseHTTPRequestHandler):
 			elif ret == 401:
 				self.send_response(401)
 				self.end_headers()
+			# Trends for the specified point are not enabled on server side
+			elif ret == 501:
+				self.send_response(501)
+				self.end_headers()
 			# Write back JSON data
 			else:
 				payload = json.dumps(ret)
@@ -95,13 +99,16 @@ class MyServer(BaseHTTPRequestHandler):
 				self.send_header("Content-type", "application/json")
 				self.end_headers()
 				self.wfile.write(payload.encode('utf-8'))
+def main():
+	# Declare HTTP server request object with declared hostname and port number.
+	myServer = HTTPServer((hostName, hostPort), MyServer)
+	print(time.asctime(), "Server Starts - %s:%s" % (hostName, hostPort))
 
-# Declare HTTP server request object with declared hostname and port number.
-myServer = HTTPServer((hostName, hostPort), MyServer)
-print(time.asctime(), "Server Starts - %s:%s" % (hostName, hostPort))
+	try:# Run server forever or until keyboard termination.
+	    myServer.serve_forever()
+	except KeyboardInterrupt:
+		print("Keyboard interrupt. Server terminated")
+		myServer.socket.close()
 
-try:# Run server forever or until keyboard termination.
-    myServer.serve_forever()
-except KeyboardInterrupt:
-	print("Keyboard interrupt. Server terminated")
-	myServer.socket.close()
+if __name__ == '__main__':
+    main()

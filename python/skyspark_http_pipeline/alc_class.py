@@ -128,6 +128,9 @@ class alc_client():
 				elif 'Unauthorized' in str(e): # Credentials incorrect
 					return 401
 
+				elif 'Trends are not enabled' in str(e): # Trend data not enabled
+					return 501
+
 		dictionary = dict(zip(time, data))
 		dictlist = []
 		holdingDict = {}
