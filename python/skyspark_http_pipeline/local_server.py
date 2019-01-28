@@ -74,9 +74,9 @@ class MyServer(BaseHTTPRequestHandler):
 			unquoted_path = urllib.parse.unquote_plus(self.path)
 			items = unquoted_path.split('?') # Log = 1, start_date = 2, end = 3
 			data = [items[1]] # Logs go in as a list
-			start_date = datetime.strptime(items[2], '%Y-%m-%d %H:%M:%S').strftime('%m/%d/%Y %I:%M:%S %p')
+			start_date = datetime.strptime(items[2], '%Y-%m-%d %I:%M:%S %p').strftime('%m/%d/%Y %I:%M:%S %p')
 
-			end_date = datetime.strptime(items[3], '%Y-%m-%d %H:%M:%S').strftime('%m/%d/%Y %I:%M:%S %p')
+			end_date = datetime.strptime(items[3], '%Y-%m-%d %I:%M:%S %p').strftime('%m/%d/%Y %I:%M:%S %p')
 
 			ret = ALC_CLIENT.collect_data(trend_log_paths=data, start_time=start_date, final_time=end_date)
 
