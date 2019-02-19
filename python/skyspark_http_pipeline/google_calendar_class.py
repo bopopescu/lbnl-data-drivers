@@ -67,7 +67,7 @@ class google_cal_client():
 
         try:
             events_result = service.events().list(calendarId=calendar_id, timeMin=start_time, timeMax=end_time,
-                                                  maxResults=30, singleEvents=True,
+                                                  maxResults=60, singleEvents=True,
                                                   orderBy='startTime').execute()
             events = events_result.get('items', [])
 
