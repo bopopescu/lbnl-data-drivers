@@ -1,0 +1,50 @@
+/*
+
+  This function queries room booking information through 
+  local server for specific timeframe from LBNL Google Calendar,
+  deletes old saved data for that range, and write schedule 
+  information in boolean form.
+  
+  Arguments: 
+  point        LBNL conference room available for scheduling with point->calendarID variable
+  start_date   dateTime object specifying start of ranged query
+  end_date     dateTime object specifying end of ranged query
+  
+  // LBNL // JBR // Last Update: 2019-02-19 //
+
+*/
+
+(point, start_date, end_date) => do
+  
+  link: readById(point->id)
+  
+  uri: point->calendarID.toStr() +"?"+start_date+"?"+end_date+"?calendar"
+  
+  // Local Python server is running on port 9000
+  query: "http://localhost:9000/?"+uri
+ 
+  // Call ioReadJson to Python server for middleman request
+  // Parse returned timeseries string into JSON format
+  data: ioReadJson(``+query)
+  
+  // Iterate on rows, parse and store data
+  result_list: []
+  data["value"].map row => do
+    datum_list: row[1]
+    time_list: row[0]
+    time_list = parseDateTime(time_list+" Los_Angeles", "YYYY-MM-DD hh:mm:ss", "Los_Angeles")
+    result_list = result_list.add({ts: time_list, val: datum_list})
+  end
+  
+  // Convert dates to dateTime and make into DateSpan
+  start_time: start_date.parseDateTime("MM/DD/YYYY hh:mm:ss")
+  end_time: end_date.parseDateTime("MM/DD/YYYY hh:mm:ss")
+  time_span: toDateSpan(start_time..end_time)
+  
+  // Delete old history for given timespan
+  link.hisRemove(time_span)
+  
+  // Write new data to point
+  result_grid: result_list.toGrid
+  hisWrite(result_grid, link)
+end

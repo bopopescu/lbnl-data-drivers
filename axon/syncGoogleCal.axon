@@ -1,0 +1,35 @@
+/*
+
+  This function takes a grid of points for
+  Google Calendar with the beginning and ending
+  time for the sliding window (currently is 2h <= now () <= 2day)
+  and passes each point to inner google calendar function.
+  
+  Arguments: 
+  google_points     Grid of points with point->calendarID variable
+  start_date        dateTime for beginning of sliding window
+  end_date          dateTime for ending of sliding window
+  
+  // LBNL // JBR // Last Update: 2019-02-19 //
+
+*/
+
+(google_points, start_date, end_date) => do
+
+  // For each point in grid, call base calendar function
+  // with correct start and end time
+  google_points.each row => do
+  try do
+  
+    start_date = start_date.format("MM/DD/YYYY hh:mm:ss")
+    end_date = end_date.format("MM/DD/YYYY hh:mm:ss")
+  
+    googleCalRead(row, start_date, end_date)
+     
+   end // end try
+   catch (ex) do
+     echo(ex)
+   end// end try
+   
+  end// end each
+end
